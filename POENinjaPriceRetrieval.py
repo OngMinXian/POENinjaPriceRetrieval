@@ -5,8 +5,14 @@ import os.path
 
 class POENinjaPriceRetrieval:
 
-    def __init__(self, league_name):
+    def __init__(self, league_name, fileSaveDir = None):
         self.league_name = league_name
+
+        if fileSaveDir == None:
+            self.fileSaveDir = "C:/Users/ongmi/Documents/POETools/priceHistory/POENinja/"
+        else:
+            self.fileSaveDir = fileSaveDir
+
         self.currency_URL = f"https://poe.ninja/api/data/currencyoverview?league={league_name}&type=Currency"
         self.fragment_URL = f"https://poe.ninja/api/data/currencyoverview?league={league_name}&type=Fragment"
         self.divination_card_URL = f"https://poe.ninja/api/data/itemoverview?league={league_name}&type=DivinationCard"
@@ -104,8 +110,7 @@ class POENinjaPriceRetrieval:
 
     def save_prices(self):
         today = datetime.date.today()
-        file_name = f"./priceHistory/POENinja/{self.league_name}_{today}-POENinja_Prices.csv"
-
+        file_name = f"{self.fileSaveDir}{self.league_name}_{today}-POENinja_Prices.csv"
         # Data generated already today
         if os.path.isfile(file_name):
             return
@@ -128,3 +133,8 @@ class POENinjaPriceRetrieval:
             self.save_prices()
 
         return self.df_price
+    
+if __name__ == "__main__":
+    LEAGUE_NAME = "Necropolis"
+    poeNinjaPriceRetrieval = POENinjaPriceRetrieval(LEAGUE_NAME)
+    poeNinjaPriceRetrieval.retrieve_prices()
