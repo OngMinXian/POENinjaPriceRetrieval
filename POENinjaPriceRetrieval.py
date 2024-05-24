@@ -44,8 +44,12 @@ class POENinjaPriceRetrieval:
         data = []
         for currency in response_json:
             name = currency["detailsId"]
-            chaos_price = currency["receive"]["value"]
-            listing_count = currency["receive"]["listing_count"]
+            try:
+                chaos_price = currency["receive"]["value"]
+                listing_count = currency["receive"]["listing_count"]
+            except:
+                chaos_price = pd.NA
+                listing_count = pd.NA
             data.append((type, name, chaos_price, listing_count))
 
         df = pd.DataFrame(data, columns=["Type", "Name", "Chaos Price", "Listing Count"])
@@ -66,7 +70,7 @@ class POENinjaPriceRetrieval:
         df = pd.DataFrame(data, columns=["Type", "Name", "Chaos Price", "Listing Count"])
         return df
 
-    def retrieve_prices(self):
+    def retrieve_prices_from_POENinja(self):
         self.df_price = pd.concat([
             self.retrieve_currency_price(self.currency_URL, "Currency"),
             self.retrieve_currency_price(self.fragment_URL, "Fragment"),
@@ -98,7 +102,7 @@ class POENinjaPriceRetrieval:
             self.retrieve_item_price(self.vial_URL, "Vial"),
         ])
 
-    def save_data(self):
+    def save_prices(self):
         today = datetime.date.today()
         file_name = f"./priceHistory/POENinja/{self.league_name}_{today}-POENinja_Prices.csv"
 
@@ -108,5 +112,19 @@ class POENinjaPriceRetrieval:
         
         # Generate data
         else:
-            self.retrieve_prices()
+            self.retrieve_prices_from_POENinja()
             self.df_price.to_csv(file_name, header=True, index=False)
+
+    def retrieve_prices(self, league_name = None, date = None):
+        if league_name == None:
+            league_name = self.league_name
+        if date == None:
+            date = datetime.date.today()
+        file_name = f"./priceHistory/POENinja/{league_name}_{date}-POENinja_Prices.csv"
+
+        try:
+            self.df_price = pd.read_csv(file_name)
+        except FileNotFoundError:
+            self.save_prices()
+
+        return self.df_price
