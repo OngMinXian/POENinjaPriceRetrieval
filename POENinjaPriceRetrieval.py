@@ -2,6 +2,7 @@ import requests
 import pandas as pd
 import datetime
 import os.path
+import time
 
 class POENinjaPriceRetrieval:
 
@@ -43,6 +44,7 @@ class POENinjaPriceRetrieval:
         self.vial_URL = f"https://poe.ninja/api/data/itemoverview?league={league_name}&type=Vial"
 
     def retrieve_currency_price(self, URL, type):
+        print(f"Retrieving {type} prices")
         response = requests.get(URL)
         response_json = response.json()["lines"]
 
@@ -62,6 +64,7 @@ class POENinjaPriceRetrieval:
         return df
     
     def retrieve_item_price(self, URL, type):
+        print(f"Retrieving {type} prices")
         response = requests.get(URL)
         response_json = response.json()["lines"]
 
@@ -77,6 +80,7 @@ class POENinjaPriceRetrieval:
         return df
 
     def retrieve_prices_from_POENinja(self):
+        print("Sending HTTP Get Requests")
         self.df_price = pd.concat([
             self.retrieve_currency_price(self.currency_URL, "Currency"),
             self.retrieve_currency_price(self.fragment_URL, "Fragment"),
@@ -106,6 +110,7 @@ class POENinjaPriceRetrieval:
             self.retrieve_item_price(self.beast_URL, "Beast"),
             self.retrieve_item_price(self.essence_URL, "Essence"),
             self.retrieve_item_price(self.vial_URL, "Vial"),
+            print("All prices retrieved")
         ])
 
     def save_prices(self):
@@ -113,12 +118,14 @@ class POENinjaPriceRetrieval:
         file_name = f"{self.fileSaveDir}{self.league_name}_{today}-POENinja_Prices.csv"
         # Data generated already today
         if os.path.isfile(file_name):
+            print(f"Prices already exist at {file_name}")
             return
         
         # Generate data
         else:
             self.retrieve_prices_from_POENinja()
             self.df_price.to_csv(file_name, header=True, index=False)
+            print(f"Prices saved to {file_name}")
 
     def retrieve_prices(self, league_name = None, date = None):
         if league_name == None:
@@ -134,7 +141,21 @@ class POENinjaPriceRetrieval:
 
         return self.df_price
     
+def retrieve_league_name():
+    request = requests.get("https://poe.ninja/api/data/getindexstate?")
+    LEAGUE_NAME = request.json()["economyLeagues"][0]["name"]
+    return LEAGUE_NAME
+    
 if __name__ == "__main__":
-    LEAGUE_NAME = "Necropolis"
-    poeNinjaPriceRetrieval = POENinjaPriceRetrieval(LEAGUE_NAME)
-    poeNinjaPriceRetrieval.retrieve_prices()
+    time.sleep(15)
+    while True:
+        try:
+            LEAGUE_NAME = retrieve_league_name()
+            print(f"Running POENinja Price Retrieval on {LEAGUE_NAME} league")
+            poeNinjaPriceRetrieval = POENinjaPriceRetrieval(LEAGUE_NAME)
+            poeNinjaPriceRetrieval.save_prices()
+            break
+        except Exception as err:
+            print(f"Error encountered: {err}")
+    print("Programme will exit in 15 seconds")
+    time.sleep(15)
