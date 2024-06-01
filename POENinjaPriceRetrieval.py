@@ -6,51 +6,70 @@ import time
 
 class POENinjaPriceRetrieval:
 
-    def __init__(self, league_name, fileSaveDir = None):
-        self.league_name = league_name
+    def __init__(self, fileSaveDir = None):
+        self.league_name = self.retrieve_league_name()
 
         if fileSaveDir == None:
             self.fileSaveDir = "C:/Users/ongmi/Documents/POETools/priceHistory/POENinja/"
         else:
             self.fileSaveDir = fileSaveDir
 
-        self.currency_URL = f"https://poe.ninja/api/data/currencyoverview?league={league_name}&type=Currency"
-        self.fragment_URL = f"https://poe.ninja/api/data/currencyoverview?league={league_name}&type=Fragment"
-        self.divination_card_URL = f"https://poe.ninja/api/data/itemoverview?league={league_name}&type=DivinationCard"
-        self.artifact_URL = f"https://poe.ninja/api/data/itemoverview?league={league_name}&type=Artifact"
-        self.oil_URL = f"https://poe.ninja/api/data/itemoverview?league={league_name}&type=Oil"
-        self.incubator_URL = f"https://poe.ninja/api/data/itemoverview?league={league_name}&type=Incubator"
-        self.unique_weapon_URL = f"https://poe.ninja/api/data/itemoverview?league={league_name}&type=UniqueWeapon"
-        self.unique_armour_URL = f"https://poe.ninja/api/data/itemoverview?league={league_name}&type=UniqueArmour"
-        self.unique_accessory_URL = f"https://poe.ninja/api/data/itemoverview?league={league_name}&type=UniqueAccessory"
-        self.unique_flask_URL = f"https://poe.ninja/api/data/itemoverview?league={league_name}&type=UniqueFlask"
-        self.unique_jewel_URL = f"https://poe.ninja/api/data/itemoverview?league={league_name}&type=UniqueJewel"
-        self.unique_relic_URL = f"https://poe.ninja/api/data/itemoverview?league={league_name}&type=UniqueRelic"
-        self.skill_gem_URL = f"https://poe.ninja/api/data/itemoverview?league={league_name}&type=SkillGem"
-        self.cluster_jewel_URL = f"https://poe.ninja/api/data/itemoverview?league={league_name}&type=ClusterJewel"
-        self.map_URL = f"https://poe.ninja/api/data/itemoverview?league={league_name}&type=Map"
-        self.blighted_map_URL = f"https://poe.ninja/api/data/itemoverview?league={league_name}&type=BlightedMap"
-        self.blight_ravaged_map_URL = f"https://poe.ninja/api/data/itemoverview?league={league_name}&type=BlightRavagedMap"
-        self.unique_map_URL = f"https://poe.ninja/api/data/itemoverview?league={league_name}&type=UniqueMap"
-        self.delirium_orb_URL = f"https://poe.ninja/api/data/itemoverview?league={league_name}&type=DeliriumOrb"
-        self.invitation_URL = f"https://poe.ninja/api/data/itemoverview?league={league_name}&type=Invitation"
-        self.scarab_URL = f"https://poe.ninja/api/data/itemoverview?league={league_name}&type=Scarab"
-        self.memory_URL = f"https://poe.ninja/api/data/itemoverview?league={league_name}&type=Memory"
-        self.base_type_URL = f"https://poe.ninja/api/data/itemoverview?league={league_name}&type=BaseType"
-        self.fossil_URL = f"https://poe.ninja/api/data/itemoverview?league={league_name}&type=Fossil"
-        self.resonator_URL = f"https://poe.ninja/api/data/itemoverview?league={league_name}&type=Resonator"
-        self.beast_URL = f"https://poe.ninja/api/data/itemoverview?league={league_name}&type=Beast"
-        self.essence_URL = f"https://poe.ninja/api/data/itemoverview?league={league_name}&type=Essence"
-        self.vial_URL = f"https://poe.ninja/api/data/itemoverview?league={league_name}&type=Vial"
+        self.currency_URL = f"https://poe.ninja/api/data/currencyoverview?league={self.league_name}&type=Currency"
+        self.fragment_URL = f"https://poe.ninja/api/data/currencyoverview?league={self.league_name}&type=Fragment"
+        self.divination_card_URL = f"https://poe.ninja/api/data/itemoverview?league={self.league_name}&type=DivinationCard"
+        self.artifact_URL = f"https://poe.ninja/api/data/itemoverview?league={self.league_name}&type=Artifact"
+        self.oil_URL = f"https://poe.ninja/api/data/itemoverview?league={self.league_name}&type=Oil"
+        self.incubator_URL = f"https://poe.ninja/api/data/itemoverview?league={self.league_name}&type=Incubator"
+        self.unique_weapon_URL = f"https://poe.ninja/api/data/itemoverview?league={self.league_name}&type=UniqueWeapon"
+        self.unique_armour_URL = f"https://poe.ninja/api/data/itemoverview?league={self.league_name}&type=UniqueArmour"
+        self.unique_accessory_URL = f"https://poe.ninja/api/data/itemoverview?league={self.league_name}&type=UniqueAccessory"
+        self.unique_flask_URL = f"https://poe.ninja/api/data/itemoverview?league={self.league_name}&type=UniqueFlask"
+        self.unique_jewel_URL = f"https://poe.ninja/api/data/itemoverview?league={self.league_name}&type=UniqueJewel"
+        self.unique_relic_URL = f"https://poe.ninja/api/data/itemoverview?league={self.league_name}&type=UniqueRelic"
+        self.skill_gem_URL = f"https://poe.ninja/api/data/itemoverview?league={self.league_name}&type=SkillGem"
+        self.cluster_jewel_URL = f"https://poe.ninja/api/data/itemoverview?league={self.league_name}&type=ClusterJewel"
+        self.map_URL = f"https://poe.ninja/api/data/itemoverview?league={self.league_name}&type=Map"
+        self.blighted_map_URL = f"https://poe.ninja/api/data/itemoverview?league={self.league_name}&type=BlightedMap"
+        self.blight_ravaged_map_URL = f"https://poe.ninja/api/data/itemoverview?league={self.league_name}&type=BlightRavagedMap"
+        self.unique_map_URL = f"https://poe.ninja/api/data/itemoverview?league={self.league_name}&type=UniqueMap"
+        self.delirium_orb_URL = f"https://poe.ninja/api/data/itemoverview?league={self.league_name}&type=DeliriumOrb"
+        self.invitation_URL = f"https://poe.ninja/api/data/itemoverview?league={self.league_name}&type=Invitation"
+        self.scarab_URL = f"https://poe.ninja/api/data/itemoverview?league={self.league_name}&type=Scarab"
+        self.memory_URL = f"https://poe.ninja/api/data/itemoverview?league={self.league_name}&type=Memory"
+        self.base_type_URL = f"https://poe.ninja/api/data/itemoverview?league={self.league_name}&type=BaseType"
+        self.fossil_URL = f"https://poe.ninja/api/data/itemoverview?league={self.league_name}&type=Fossil"
+        self.resonator_URL = f"https://poe.ninja/api/data/itemoverview?league={self.league_name}&type=Resonator"
+        self.beast_URL = f"https://poe.ninja/api/data/itemoverview?league={self.league_name}&type=Beast"
+        self.essence_URL = f"https://poe.ninja/api/data/itemoverview?league={self.league_name}&type=Essence"
+        self.vial_URL = f"https://poe.ninja/api/data/itemoverview?league={self.league_name}&type=Vial"
+
+    def get_request(self, URL):
+        tries = 1
+        while True:
+            try:
+                time.sleep(5)
+                print(f"Sending request {tries}")
+                header = {
+                    'Content-Type': 'application/json',
+                    'accept': 'application/json',
+                    "Connection": "keep-alive",
+                }
+                response = requests.get(URL, headers=header)
+                response_json = response.json()
+                return response_json
+            except Exception:
+                tries += 1
+
+    def retrieve_league_name(self):
+        print("Retrieving league name")
+        return self.get_request("https://poe.ninja/api/data/getindexstate?")["economyLeagues"][0]["name"]
 
     def retrieve_currency_price(self, URL, type):
         print(f"Retrieving {type} prices")
-        response = requests.get(URL)
-        response_json = response.json()["lines"]
 
         # Parse json data for currency information
         data = []
-        for currency in response_json:
+        for currency in self.get_request(URL)["lines"]:
             name = currency["detailsId"]
             try:
                 chaos_price = currency["receive"]["value"]
@@ -65,12 +84,10 @@ class POENinjaPriceRetrieval:
     
     def retrieve_item_price(self, URL, type):
         print(f"Retrieving {type} prices")
-        response = requests.get(URL)
-        response_json = response.json()["lines"]
 
         # Parse json data for item information
         data = []
-        for item in response_json:
+        for item in self.get_request(URL)["lines"]:
             name = item["detailsId"]
             chaos_price = item["chaosValue"]
             listing_count = item["listingCount"]
@@ -80,7 +97,7 @@ class POENinjaPriceRetrieval:
         return df
 
     def retrieve_prices_from_POENinja(self):
-        print("Sending HTTP Get Requests")
+        print(f"Running POENinja Price Retrieval on {self.league_name} league")
         self.df_price = pd.concat([
             self.retrieve_currency_price(self.currency_URL, "Currency"),
             self.retrieve_currency_price(self.fragment_URL, "Fragment"),
@@ -141,21 +158,14 @@ class POENinjaPriceRetrieval:
 
         return self.df_price
     
-def retrieve_league_name():
-    request = requests.get("https://poe.ninja/api/data/getindexstate?")
-    LEAGUE_NAME = request.json()["economyLeagues"][0]["name"]
-    return LEAGUE_NAME
-    
 if __name__ == "__main__":
-    time.sleep(15)
-    while True:
-        try:
-            LEAGUE_NAME = retrieve_league_name()
-            print(f"Running POENinja Price Retrieval on {LEAGUE_NAME} league")
-            poeNinjaPriceRetrieval = POENinjaPriceRetrieval(LEAGUE_NAME)
-            poeNinjaPriceRetrieval.save_prices()
-            break
-        except Exception as err:
-            print(f"Error encountered: {err}")
-    print("Programme will exit in 15 seconds")
-    time.sleep(15)
+    countdown_to_start = 5*60
+    while countdown_to_start:
+        print(f"POENinja Price Retrieval will start in {countdown_to_start} seconds.", "\r", end="")
+        countdown_to_start -= 1
+        time.sleep(1)
+    print("")
+    poeNinjaPriceRetrieval = POENinjaPriceRetrieval()
+    poeNinjaPriceRetrieval.save_prices()
+    print("Programme will exit in 30 seconds")
+    time.sleep(30)
