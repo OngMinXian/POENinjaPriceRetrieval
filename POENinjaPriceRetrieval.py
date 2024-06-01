@@ -1,18 +1,18 @@
 import requests
 import pandas as pd
 import datetime
-import os.path
+import os
 import time
 
 class POENinjaPriceRetrieval:
 
-    def __init__(self, fileSaveDir = None):
+    def __init__(self, file_save_dir = None):
         self.league_name = self.retrieve_league_name()
 
-        if fileSaveDir == None:
-            self.fileSaveDir = "C:/Users/ongmi/Documents/POETools/priceHistory/POENinja/"
+        if file_save_dir == None:
+            self.file_save_dir = "C:/Users/ongmi/Documents/POETools/priceHistory/POENinja/"
         else:
-            self.fileSaveDir = fileSaveDir
+            self.file_save_dir = file_save_dir
 
         self.currency_URL = f"https://poe.ninja/api/data/currencyoverview?league={self.league_name}&type=Currency"
         self.fragment_URL = f"https://poe.ninja/api/data/currencyoverview?league={self.league_name}&type=Fragment"
@@ -132,7 +132,7 @@ class POENinjaPriceRetrieval:
 
     def save_prices(self):
         today = datetime.date.today()
-        file_name = f"{self.fileSaveDir}{self.league_name}_{today}-POENinja_Prices.csv"
+        file_name = f"{self.file_save_dir}{self.league_name}_{today}-POENinja_Prices.csv"
         # Data generated already today
         if os.path.isfile(file_name):
             print(f"Prices already exist at {file_name}")
@@ -165,7 +165,13 @@ if __name__ == "__main__":
         countdown_to_start -= 1
         time.sleep(1)
     print("")
+
     poeNinjaPriceRetrieval = POENinjaPriceRetrieval()
     poeNinjaPriceRetrieval.save_prices()
-    print("Programme will exit in 30 seconds")
-    time.sleep(30)
+
+    countdown_to_end = 1*60
+    while countdown_to_end:
+        print(f"POENinja Price Retrieval will close in {countdown_to_end} seconds.", "\r", end="")
+        countdown_to_end -= 1
+        time.sleep(1)
+    print("")
