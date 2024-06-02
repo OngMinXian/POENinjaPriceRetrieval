@@ -1,2 +1,3 @@
 __pycache__
-priceHistory
+.config.txt
+.credentials.json

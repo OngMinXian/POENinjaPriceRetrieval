@@ -1,18 +1,14 @@
 import requests
 import pandas as pd
 import datetime
-import os
 import time
+from gSheetController import gSheetController
 
 class POENinjaPriceRetrieval:
 
-    def __init__(self, file_save_dir = None):
+    def __init__(self):
         self.league_name = self.retrieve_league_name()
-
-        if file_save_dir == None:
-            self.file_save_dir = "C:/Users/ongmi/Documents/POETools/priceHistory/POENinja/"
-        else:
-            self.file_save_dir = file_save_dir
+        self.gSheetController = gSheetController(self.league_name)
 
         self.currency_URL = f"https://poe.ninja/api/data/currencyoverview?league={self.league_name}&type=Currency"
         self.fragment_URL = f"https://poe.ninja/api/data/currencyoverview?league={self.league_name}&type=Fragment"
@@ -47,8 +43,7 @@ class POENinjaPriceRetrieval:
         tries = 1
         while True:
             try:
-                time.sleep(5)
-                print(f"Sending request {tries}")
+                print(f"Sending request {tries}", "\r", end="")
                 header = {
                     'Content-Type': 'application/json',
                     'accept': 'application/json',
@@ -56,13 +51,17 @@ class POENinjaPriceRetrieval:
                 }
                 response = requests.get(URL, headers=header)
                 response_json = response.json()
+                print("Response received")
                 return response_json
             except Exception:
                 tries += 1
+                time.sleep(1)
 
     def retrieve_league_name(self):
         print("Retrieving league name")
-        return self.get_request("https://poe.ninja/api/data/getindexstate?")["economyLeagues"][0]["name"]
+        league_name = self.get_request("https://poe.ninja/api/data/getindexstate?")["economyLeagues"][0]["name"]
+        print(f"League found: {league_name}")
+        return league_name
 
     def retrieve_currency_price(self, URL, type):
         print(f"Retrieving {type} prices")
@@ -130,48 +129,9 @@ class POENinjaPriceRetrieval:
             print("All prices retrieved")
         ])
 
-    def save_prices(self):
-        today = datetime.date.today()
-        file_name = f"{self.file_save_dir}{self.league_name}_{today}-POENinja_Prices.csv"
-        # Data generated already today
-        if os.path.isfile(file_name):
-            print(f"Prices already exist at {file_name}")
-            return
-        
-        # Generate data
-        else:
-            self.retrieve_prices_from_POENinja()
-            self.df_price.to_csv(file_name, header=True, index=False)
-            print(f"Prices saved to {file_name}")
-
-    def retrieve_prices(self, league_name = None, date = None):
-        if league_name == None:
-            league_name = self.league_name
-        if date == None:
-            date = datetime.date.today()
-        file_name = f"./priceHistory/POENinja/{league_name}_{date}-POENinja_Prices.csv"
-
-        try:
-            self.df_price = pd.read_csv(file_name)
-        except FileNotFoundError:
-            self.save_prices()
-
-        return self.df_price
+    def update_gSheet_with_prices(self):
+        self.retrieve_prices_from_POENinja()
+        worksheet_name = f"{self.league_name}_{datetime.date.today()}-POENinja_Prices"
+        self.gSheetController.create_workSheet(worksheet_name, self.df_price.shape[0], self.df_price.shape[1])
+        self.gSheetController.update_workSheet(worksheet_name, self.df_price)
     
-if __name__ == "__main__":
-    countdown_to_start = 5*60
-    while countdown_to_start:
-        print(f"POENinja Price Retrieval will start in {countdown_to_start} seconds.", "\r", end="")
-        countdown_to_start -= 1
-        time.sleep(1)
-    print("")
-
-    poeNinjaPriceRetrieval = POENinjaPriceRetrieval()
-    poeNinjaPriceRetrieval.save_prices()
-
-    countdown_to_end = 1*60
-    while countdown_to_end:
-        print(f"POENinja Price Retrieval will close in {countdown_to_end} seconds.", "\r", end="")
-        countdown_to_end -= 1
-        time.sleep(1)
-    print("")
