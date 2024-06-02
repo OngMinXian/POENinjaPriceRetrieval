@@ -55,7 +55,7 @@ class POENinjaPriceRetrieval:
                 return response_json
             except Exception:
                 tries += 1
-                time.sleep(1)
+                time.sleep(5)
 
     def retrieve_league_name(self):
         print("Retrieving league name")
